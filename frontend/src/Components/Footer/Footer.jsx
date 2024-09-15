@@ -8,8 +8,8 @@ export const Footer = () => {
   return (
     <div className="flex flex-col justify-center items-center gap-12 py-10 bg-gray-100">
       <div className="flex items-center gap-5">
-        <img src={footer_logo} alt="Logo" className="w-auto h-auto" />
-        <p className="text-gray-800 text-5xl font-bold">SHOPPER</p>
+        <img src="https://teeshopper.in/store_page_asset/images/VogueVault-Clothing.png" alt="Logo" className="w-[100px] h-[100px]" />
+        <p className="text-gray-800 text-5xl font-bold">VogueVault</p>
       </div>
       <ul className="flex list-none gap-12 text-gray-800 text-lg">
         <li className="cursor-pointer transition-colors duration-300 ease-in-out hover:text-red-500">Company</li>

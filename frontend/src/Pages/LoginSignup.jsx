@@ -17,15 +17,15 @@ export const LoginSignup = () => {
   };
 
   const signUp = async () => {
-    console.log("signUp function executed", formData);
+    console.log("SignUp function executed", formData);
   };
 
   return (
-    <div className="loginsignup w-full h-[80vh] bg-[#fce3fe] pt-[100px] flex justify-center items-center">
-      <div className="loginsignup-container w-[580px] h-full bg-white p-10 mb-7 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-7 text-center">{state}</h1>
+    <div className="w-full h-screen bg-[#fce3fe] pt-16 flex justify-center items-center">
+      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold mb-6 text-center">{state}</h1>
 
-        <div className="loginsignup-fields flex flex-col gap-5 mb-6">
+        <div className="flex flex-col gap-4 mb-6">
           {/* Conditionally render the Name input field for Sign Up */}
           {state === "Sign Up" && (
             <input
@@ -34,29 +34,29 @@ export const LoginSignup = () => {
               value={formData.username}
               onChange={changeHandler}
               placeholder="Please Enter your Name"
-              className="h-16 w-full px-5 border border-solid border-[#c9c9c9] outline-none text-[#5c5c5c] text-lg rounded-lg focus:border-red-500"
+              className="h-14 w-full px-4 border border-gray-300 rounded-lg text-gray-700 focus:border-red-500 focus:outline-none"
             />
           )}
           <input
             type="email"
-            placeholder="Please Enter your Email"
             name="email"
             value={formData.email}
             onChange={changeHandler}
-            className="h-16 w-full px-5 border border-solid border-[#c9c9c9] outline-none text-[#5c5c5c] text-lg rounded-lg focus:border-red-500"
+            placeholder="Please Enter your Email"
+            className="h-14 w-full px-4 border border-gray-300 rounded-lg text-gray-700 focus:border-red-500 focus:outline-none"
           />
           <input
             type="password"
-            placeholder="Please Enter your Password"
             name="password"
             value={formData.password}
             onChange={changeHandler}
-            className="h-16 w-full px-5 border border-solid border-[#c9c9c9] outline-none text-[#5c5c5c] text-lg rounded-lg focus:border-red-500"
+            placeholder="Please Enter your Password"
+            className="h-14 w-full px-4 border border-gray-300 rounded-lg text-gray-700 focus:border-red-500 focus:outline-none"
           />
         </div>
 
         <button
-          className="w-full h-14 bg-red-500 text-white text-lg rounded-lg hover:bg-red-600 focus:bg-red-600 transition duration-300 cursor-pointer border-none font-medium"
+          className="w-full h-12 bg-black text-yellow-500 text-lg rounded-lg hover:bg-red-600 focus:bg-red-600 transition duration-300 cursor-pointer border-none font-medium"
           onClick={() => { state === 'Login' ? login() : signUp(); }}
         >
           Continue
@@ -69,7 +69,7 @@ export const LoginSignup = () => {
             <a
               href="#"
               onClick={() => setState('Login')}
-              className="text-red-500 hover:underline"
+              className="text-yellow-500 hover:underline"
             >
               Login here
             </a>
@@ -80,22 +80,22 @@ export const LoginSignup = () => {
             <a
               href="#"
               onClick={() => setState('Sign Up')}
-              className="text-red-500 hover:underline"
+              className="text-yellow-500 hover:underline"
             >
               Click Here
             </a>
           </p>
         )}
 
-        <div className="loginsignup-agree flex items-start mt-6">
-          <input type="checkbox" id="terms" className="mt-1 mr-2" required />
+        <div className="flex items-start mt-4">
+          <input type="checkbox" id="terms" className="mr-2" required />
           <label htmlFor="terms" className="text-sm text-gray-600">
             By continuing, I agree to the{' '}
-            <a href="/terms" className="text-red-500 hover:underline">
+            <a href="/terms" className="text-yellow-500 hover:underline">
               terms of use
             </a>{' '}
             and{' '}
-            <a href="/privacy" className="text-red-500 hover:underline">
+            <a href="/privacy" className="text-yellow-500 hover:underline">
               privacy policy
             </a>.
           </label>

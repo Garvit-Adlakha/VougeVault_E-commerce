@@ -1,5 +1,4 @@
 import React from 'react';
-
 export const DescriptionBox = () => {
   return (
     <div className="mt-28 mb-28 mx-10 lg:mx-44">
