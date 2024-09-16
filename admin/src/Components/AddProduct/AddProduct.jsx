@@ -141,7 +141,7 @@ export const AddProduct = () => {
       {/* Submit Button */}
       <div className='text-right'>
         <button
-          className='bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700'
+          className='bg-black text-yellow-500 py-2 px-4 rounded-md hover:bg-indigo-700'
           onClick={addProduct}
         >
           Add Product

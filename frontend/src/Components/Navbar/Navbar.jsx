@@ -22,8 +22,8 @@ export const Navbar = () => {
       {/* Logo Section */}
       <div className="nav-logo flex items-center gap-3">
         <img src="https://teeshopper.in/store_page_asset/images/VogueVault-Clothing.png" alt="Shopper Logo" className="w-12 h-auto" />
-        <p className="text-gray-900 text-2xl font-semibold">VogueVault</p>
-      </div>
+        <p className="text-gray-900 text-2xl font">VogueVault</p>
+      </div>-semibold
 
       {/* Menu Section for larger screens */}
       <ul className="nav-menu hidden md:flex items-center list-none gap-12 text-gray-500 font-medium">
