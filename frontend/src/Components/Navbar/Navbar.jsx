@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import logo from "../Assets/logo.png";
 import cart_icon from "../Assets/cart_icon.png";
 import { Link, useNavigate } from 'react-router-dom';
 import { ShopContext } from "../../Context/ShopContext";
@@ -14,29 +13,33 @@ export const Navbar = () => {
   const handleMenuClick = (item) => {
     setMenu(item);
     setSidebarOpen(false); // Close the sidebar on click
-    navigate(`/${item === 'shop' ? '' : item}`); // Navigate to the selected page
+    navigate(`/${item === 'Home' ? '' : item}`); // Navigate to the selected page
   };
-
+ 
+const clickHandler=(e)=>{
+  e.preventDefault();
+  navigate('./')
+}
   return (
     <div className="navbar flex justify-between items-center p-4 shadow bg-white">
       {/* Logo Section */}
       <div className="nav-logo flex items-center gap-3">
-        <img src="https://teeshopper.in/store_page_asset/images/VogueVault-Clothing.png" alt="Shopper Logo" className="w-12 h-auto" />
-        <p className="text-gray-900 text-2xl font">VogueVault</p>
-      </div>-semibold
+        <img onClick={clickHandler} src="https://teeshopper.in/store_page_asset/images/VogueVault-Clothing.png" alt="Shopper Logo" className="w-12 h-auto" />
+        <p className="text-gray-900 text-2xl font-semibold">VogueVault</p>
+      </div>
 
       {/* Menu Section for larger screens */}
       <ul className="nav-menu hidden md:flex items-center list-none gap-12 text-gray-500 font-medium">
-        {["shop", "mens", "womens", "kids"].map((item) => (
+        {["Home","mens", "womens", "kids"].map((item) => (
           <li 
             key={item} 
             className="flex flex-col items-center cursor-pointer gap-1"
             onClick={() => {
               setMenu(item);
-              navigate(`/${item === 'shop' ? '' : item}`); // Navigate to the selected page
+              navigate(`/${item === 'Home' ? '' : item}`); // Navigate to the selected page
             }}
           >
-            <Link to={`/${item === 'shop' ? '' : item}`}>
+            <Link to={`/${item === 'Home' ? '' : item}`}>
               {item.charAt(0).toUpperCase() + item.slice(1)}
             </Link>
             {menu === item && (
@@ -59,7 +62,7 @@ export const Navbar = () => {
       {/* Login and Cart Section */}
       <div className="nav-login-cart flex items-center gap-6">
         <Link to="/login">
-          <button className="hidden md:block px-6 py-2 bg-yellow-500 text-white rounded-full">Login</button>
+          <button className="hidden md:block px-6 py-2 bg-yellow-500 text-black rounded-full">Login</button>
         </Link>
         <div className="relative">
           <Link to="/cart">
@@ -86,7 +89,7 @@ export const Navbar = () => {
             {["shop", "mens", "womens", "kids","login"].map((item) => (
               <li 
                 key={item} 
-                className={`py-2 px-4 cursor-pointer ${menu === item ? 'bg-black text-yellow-500' : ''}`}
+                className={`py-2 px-4 cursor-pointer ${menu === item ? 'bg-black text-yellow-300' : ''}`}
                 onClick={() => handleMenuClick(item)}
               >
                 {item.charAt(0).toUpperCase() + item.slice(1)}
