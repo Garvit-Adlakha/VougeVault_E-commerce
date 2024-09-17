@@ -1,12 +1,14 @@
-import React, { useContext, useState } from "react";
+import React, { useState,useContext } from "react";
 import cart_icon from "../Assets/cart_icon.png";
 import { Link, useNavigate } from 'react-router-dom';
 import { ShopContext } from "../../Context/ShopContext";
+import { useAuth } from "../../Context/AuthContext"; // Import useAuth
 
 export const Navbar = () => {
   const [menu, setMenu] = useState("shop");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { getTotalCartItems } = useContext(ShopContext);
+  const { isLoggedIn, logout } = useAuth(); // Destructure isLoggedIn and logout from useAuth
   const navigate = useNavigate();
 
   // Function to handle menu item click
@@ -15,28 +17,29 @@ export const Navbar = () => {
     setSidebarOpen(false); // Close the sidebar on click
     navigate(`/${item === 'Home' ? '' : item}`); // Navigate to the selected page
   };
- 
-const clickHandler=(e)=>{
-  e.preventDefault();
-  navigate('./')
-}
+
+  const clickHandler = (e) => {
+    e.preventDefault();
+    navigate('./');
+  };
+
   return (
     <div className="navbar flex justify-between items-center p-4 shadow bg-white">
       {/* Logo Section */}
       <div className="nav-logo flex items-center gap-3">
-        <img onClick={clickHandler} src="https://teeshopper.in/store_page_asset/images/VogueVault-Clothing.png" alt="Shopper Logo" className="w-12 h-auto" />
+        <img onClick={clickHandler} src="https://teeshopper.in/store_page_asset/images/VogueVault-Clothing.png" alt="Shopper Logo" className="w-12 h-auto cursor-pointer" />
         <p className="text-gray-900 text-2xl font-semibold">VogueVault</p>
       </div>
 
       {/* Menu Section for larger screens */}
       <ul className="nav-menu hidden md:flex items-center list-none gap-12 text-gray-500 font-medium">
-        {["Home","mens", "womens", "kids"].map((item) => (
-          <li 
-            key={item} 
+        {["Home", "mens", "womens", "kids"].map((item) => (
+          <li
+            key={item}
             className="flex flex-col items-center cursor-pointer gap-1"
             onClick={() => {
               setMenu(item);
-              navigate(`/${item === 'Home' ? '' : item}`); // Navigate to the selected page
+              navigate(`/${item === 'Home' ? '' : item}`);
             }}
           >
             <Link to={`/${item === 'Home' ? '' : item}`}>
@@ -50,8 +53,8 @@ const clickHandler=(e)=>{
       </ul>
 
       {/* Hamburger Menu for mobile */}
-      <button 
-        className="block md:hidden text-gray-500 focus:outline-none" 
+      <button
+        className="block md:hidden text-gray-500 focus:outline-none"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -61,9 +64,18 @@ const clickHandler=(e)=>{
 
       {/* Login and Cart Section */}
       <div className="nav-login-cart flex items-center gap-6">
-        <Link to="/login">
-          <button className="hidden md:block px-6 py-2 bg-yellow-500 text-black rounded-full">Login</button>
-        </Link>
+        {isLoggedIn ? (
+          <button
+            onClick={logout}
+            className="hidden md:block px-6 py-2 bg-yellow-500 text-black rounded-full"
+          >
+            Logout
+          </button>
+        ) : (
+          <Link to="/login">
+            <button className="hidden md:block px-6 py-2 bg-yellow-500 text-black rounded-full">Login</button>
+          </Link>
+        )}
         <div className="relative">
           <Link to="/cart">
             <img src={cart_icon} alt="Cart Icon" aria-label="Cart" className="w-8 h-auto" />
@@ -75,26 +87,41 @@ const clickHandler=(e)=>{
       </div>
 
       {/* Sidebar Menu for mobile */}
-      <div 
-        className={`fixed inset-0 bg-gray-900 bg-opacity-75 z-50 transform transition-transform ${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}
+      <div
+        className={`fixed inset-0 bg-gray-900 bg-opacity-75 z-50 transform transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         <div className="w-3/4 sm:w-1/2 md:w-1/3 h-full bg-white p-6">
-          <button 
+          <button
             className="text-gray-500 text-2xl float-right"
             onClick={() => setSidebarOpen(false)}
           >
             &times;
           </button>
           <ul className="mt-6">
-            {["shop", "mens", "womens", "kids","login"].map((item) => (
-              <li 
-                key={item} 
+            {["shop", "mens", "womens", "kids"].map((item) => (
+              <li
+                key={item}
                 className={`py-2 px-4 cursor-pointer ${menu === item ? 'bg-black text-yellow-300' : ''}`}
                 onClick={() => handleMenuClick(item)}
               >
                 {item.charAt(0).toUpperCase() + item.slice(1)}
               </li>
             ))}
+            {isLoggedIn ? (
+              <li
+                className="py-2 px-4 cursor-pointer"
+                onClick={logout}
+              >
+                Logout
+              </li>
+            ) : (
+              <li
+                className="py-2 px-4 cursor-pointer"
+                onClick={() => handleMenuClick('login')}
+              >
+                Login
+              </li>
+            )}
           </ul>
         </div>
       </div>

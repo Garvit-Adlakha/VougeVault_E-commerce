@@ -1,23 +1,49 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../Context/AuthContext'; // Import useAuth
 
 export const LoginSignup = () => {
+  const { login } = useAuth(); // Get login from context
+  const navigate = useNavigate();
   const [state, setState] = useState("Login");
   const [formData, setFormData] = useState({
-    username: "",
+    fullname: "",
     password: "",
     email: ""
   });
+  const [error, setError] = useState(""); 
 
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const login = async () => {
-    console.log("Login function executed", formData);
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:4000/api/v1/users/login', formData);
+      if (response.data.success) {
+        login(response.data.user); // Use the login function
+        navigate('/');
+      } else {
+        setError(response.data.error);
+      }
+    } catch (error) {
+      setError("Error during login: " + error.message);
+    }
   };
 
-  const signUp = async () => {
-    console.log("SignUp function executed", formData);
+  const handleSignUp = async () => {
+    try {
+      const response = await axios.post('http://localhost:4000/api/v1/users/signup', formData);
+      if (response.data.success) {
+        login(response.data.user); // Use the login function
+        navigate('/');
+      } else {
+        setError(response.data.error);
+      }
+    } catch (error) {
+      setError("Error during signup: " + error.message);
+    }
   };
 
   return (
@@ -27,13 +53,14 @@ export const LoginSignup = () => {
           {state}
         </h1>
 
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>} {/* Display error messages */}
+
         <div className="flex flex-col gap-4 mb-6">
-          {/* Conditionally render the Name input field for Sign Up */}
           {state === "Sign Up" && (
             <input
               type="text"
-              name="username"
-              value={formData.username}
+              name="fullname"
+              value={formData.fullname}
               onChange={changeHandler}
               placeholder="Enter your Name"
               className="h-14 w-full px-4 border border-gray-300 rounded-lg text-gray-700 focus:border-yellow-500 focus:outline-none"
@@ -59,12 +86,11 @@ export const LoginSignup = () => {
 
         <button
           className="w-full h-12 bg-black text-yellow-500 text-lg rounded-lg hover:bg-yellow-600 focus:bg-yellow-600 transition duration-300 border-none font-medium"
-          onClick={() => { state === 'Login' ? login() : signUp(); }}
+          onClick={() => { state === 'Login' ? handleLogin() : handleSignUp(); }}
         >
           Continue
         </button>
 
-        {/* Conditionally render text based on state */}
         {state === "Sign Up" ? (
           <p className="mt-4 text-center text-sm text-gray-600">
             Already have an account?{' '}
