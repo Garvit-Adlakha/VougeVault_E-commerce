@@ -1,11 +1,19 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import star_icon from '../Assets/star_icon.png';
 import star_dull_icon from '../Assets/star_dull_icon.png';
 import { ShopContext } from '../../Context/ShopContext';
+import Alerts from '../Alert/Alerts';
 
 export const ProductDisplay = (props) => {
   const { product } = props;
-  const {addToCart} = useContext(ShopContext)
+  const {addToCart,cartItems,setSize} = useContext(ShopContext)
+  const[alert,setAlert]=useState({type:'',message:''});
+
+  const handleAddToCart= (productId,productSize)=>{
+    addToCart(productId,productSize);
+    setAlert({type:"success",message:"Successfully added to the cart!"})
+  }
+
   return (
     <div className="flex flex-col lg:flex-row gap-10 mx-10 lg:mx-44 my-10">
       <div className="left flex gap-4">
@@ -39,19 +47,23 @@ export const ProductDisplay = (props) => {
         <div className="description text-gray-600">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime nostrum iusto incidunt quasi odit iure unde, magnam optio a ullam hic quos maiores aut est quod, fugiat eius quas! Laborum, soluta perferendis?
         </div>
+        <div className="flex space-x-2">
+  {["S", "M", "L", "XL", "XXL"].map((size) => (
+    <div
+      key={size}
+      className={`border border-gray-400 rounded px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+        cartItems[product.id]?.size === size ? "bg-red-600 text-white" : "hover:bg-slate-300"
+      }`}
+      onClick={() => setSize(product.id, size)}
+    >
+      {size}
+    </div>
+  ))}
+</div>
 
-        <div className="size mt-4">
-          <h1 className="text-lg font-semibold">Select Size</h1>
-          <div className="sizes flex gap-4 mt-2">
-            <div className="border border-gray-400 rounded px-4 py-2 cursor-pointer hover:bg-gray-200">S</div>
-            <div className="border border-gray-400 rounded px-4 py-2 cursor-pointer hover:bg-gray-200">M</div>
-            <div className="border border-gray-400 rounded px-4 py-2 cursor-pointer hover:bg-gray-200">L</div>
-            <div className="border border-gray-400 rounded px-4 py-2 cursor-pointer hover:bg-gray-200">XL</div>
-            <div className="border border-gray-400 rounded px-4 py-2 cursor-pointer hover:bg-gray-200">XXL</div>
-          </div>
-        </div>
-
-        <button className="mt-4 bg-red-500 text-white py-3 px-6 rounded-lg hover:bg-red-600" onClick={()=>{addToCart(product.id)}}>Add to Cart</button>
+        <button className="mt-4 bg-red-500 text-white py-3 px-6 rounded-lg hover:bg-red-600" onClick={()=>{
+          handleAddToCart(product.id,product.size)
+        }}>Add to Cart</button>
 
         <p className="mt-4">
           <span className="font-semibold">Category:</span> Women, Tshirt, CropTop
@@ -59,6 +71,7 @@ export const ProductDisplay = (props) => {
         <p>
           <span className="font-semibold">Tags:</span> Modern
         </p>
+        {alert.message && <Alerts type={alert.type} message={alert.message} />}
       </div>
     </div>
   );

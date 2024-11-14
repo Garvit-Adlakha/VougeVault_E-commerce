@@ -6,7 +6,7 @@ export const ShopContext = createContext(null);
 const getDefaultCart = () => {
   let cart = {};
   for (let index = 0; index < all_product.length; index++) {
-    cart[index] = 0;
+    cart[index] = { quantity: 0, size: null };
   }
   return cart;
 };
@@ -14,42 +14,70 @@ const getDefaultCart = () => {
 const ShopContextProvider = (props) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
 
-  const addToCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+  const addToCart = (itemId, size) => {
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: { 
+        quantity: (prev[itemId]?.quantity || 0) + 1,
+        size: size || prev[itemId]?.size
+      }
+    }));
     console.log(cartItems);
   };
 
+  const setSize = (itemId, size) => {
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: {
+        ...prev[itemId],
+        size: size
+      }
+    }));
+  };
+
   const removeFromCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    setCartItems((prev) => {
+      const currentQuantity = prev[itemId]?.quantity || 0;
+      if (currentQuantity > 1) {
+        return {
+          ...prev,
+          [itemId]: {
+            ...prev[itemId],
+            quantity: currentQuantity - 1,
+          }
+        };
+      } else {
+        const updatedCart = { ...prev };
+        delete updatedCart[itemId];
+        return updatedCart;
+      }
+    });
   };
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
     for (const item in cartItems) {
-      if (cartItems[item] > 0) {
+      if (cartItems[item].quantity > 0) {
         let itemInfo = all_product.find((product) => product.id === Number(item));
         if (itemInfo) {
-          totalAmount += itemInfo.new_price * cartItems[item];
+          totalAmount += itemInfo.new_price * cartItems[item].quantity;
         }
       }
     }
     return totalAmount;
   };
 
-  const getTotalCartItems= ()=>{
+  const getTotalCartItems = () => {
     let totalItem = 0;
-    for(const item in cartItems){
-        if(cartItems[item]>0)
-        {
-            totalItem+=cartItems[item]
-        }
+    for (const item in cartItems) {
+      totalItem += cartItems[item].quantity;
     }
-    return totalItem
-  }
-
+    return totalItem;
+  };
 
   const contextValue = {
     all_product,
+    setSize,
     cartItems,
     addToCart,
     removeFromCart,

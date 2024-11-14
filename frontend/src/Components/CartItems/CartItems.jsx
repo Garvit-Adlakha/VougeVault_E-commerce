@@ -11,10 +11,11 @@ export const CartItems = () => {
   return (
     <div className="container mx-auto mt-10 p-5">
       {/* Cart Header */}
-      <div className="grid grid-cols-6 gap-4 font-semibold border-b border-gray-200 pb-4 mb-4">
+      <div className="grid grid-cols-7 gap-3  text-center font-semibold border-b border-gray-200 pb-4 mb-4">
         <p>Products</p>
         <p>Title</p>
         <p>Price</p>
+        <p>Size</p>
         <p>Quantity</p>
         <p>Total</p>
         <p>Remove</p>
@@ -22,14 +23,21 @@ export const CartItems = () => {
 
       {/* Cart Items */}
       {all_product.map((product) => {
-        if (cartItems[product.id] > 0) {
+        const cartItem=cartItems[product.id]
+        if (cartItem?.quantity > 0) {
           return (
-            <div key={product.id} className="grid grid-cols-6 gap-4 items-center border-b border-gray-200 py-4">
+            <div key={product.id} className="grid grid-cols-7 gap-3 items-center border-b border-gray-200 py-4 text-center">
+            <div className="flex justify-center items-center">
               <img className="h-24 w-24 object-cover" src={product.image} alt={product.name} />
-              <p>{product.name}</p>
-              <p>${product.new_price.toFixed(2)}</p>
-              <button className="px-3 py-1 border border-gray-300 rounded">{cartItems[product.id]}</button>
-              <p>${(product.new_price * cartItems[product.id]).toFixed(2)}</p>
+            </div>
+            <p>{product.name}</p>
+            <p>{cartItem.size || "NA"}</p>
+            <p>${product.new_price.toFixed(2)}</p>
+            <div className="flex justify-center items-center">
+              <button className="px-3 py-1 border w-16 border-gray-300 rounded">{cartItem.quantity}</button>
+            </div>
+            <p>${(product.new_price * cartItem.quantity).toFixed(2)}</p>
+            <div className="flex justify-center items-center">
               <img
                 className="cursor-pointer h-6 w-6"
                 src={remove_icon}
@@ -37,6 +45,8 @@ export const CartItems = () => {
                 alt="Remove"
               />
             </div>
+          </div>
+          
           );
         }
         return null;
