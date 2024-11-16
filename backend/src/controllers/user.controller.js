@@ -1,28 +1,26 @@
 import { User } from '../models/user.model.js'; // Correct import
 import jwt from 'jsonwebtoken';
+
 // User signup
 export const signup = async (req, res) => {
     try {
         const { email, password, fullname } = req.body;
+
         // Check if user already exists
         let check = await User.findOne({ email });
 
         if (check) {
             return res.status(400).json({ success: false, error: 'Existing user found with the same email address' });
         }
-        // Initialize cart data
-        let cart = {};
-        for (let i = 0; i < 300; i++) {
-            cart[i] = 0;
-        }
 
+        // Initialize cartData as an empty array (no cart items for new user)
         // Create a new user
         const user = new User({
             fullname,
             password,
             email,
-            cartData: cart,
         });
+console.log(user.validateSync()); // Logs any validation errors
 
         // Save the user
         await user.save();
@@ -30,16 +28,16 @@ export const signup = async (req, res) => {
         // Generate token
         const data = {
             user: {
-                id: user.id,
+                userId: user.userId,  // Corrected from `user.userid`
             },
         };
-
         const token = jwt.sign(data, process.env.JWT_SECRET || 'secret_ecom'); // Use env variable for secret
         res.json({ success: true, token });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 // User login
 export const login = async (req, res) => {

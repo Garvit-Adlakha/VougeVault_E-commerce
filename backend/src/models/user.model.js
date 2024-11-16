@@ -1,9 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import AutoIncrementFactory from 'mongoose-sequence';
 
-// Define the schema for the User model
+const AutoIncrement = AutoIncrementFactory(mongoose);
+
 const userSchema = new Schema({
+    userId: {
+        type: Number,
+        unique:true,
+    },
     email: {
         type: String,
         required: true,
@@ -15,7 +21,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         trim: true,
-        index:true
+        index: true
     },
     password: {
         type: String,
@@ -23,11 +29,17 @@ const userSchema = new Schema({
     },
     refreshToken: {
         type: String
-    }
+    },
+    cartData: [{
+        type: Schema.Types.ObjectId,
+        ref: "Cart",
+        default: []
+    }]
 }, {
     timestamps: true
 });
 
+userSchema.plugin(AutoIncrement, { inc_field: 'userId' });
 // Pre-save hook to hash the password before saving the user
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
@@ -46,12 +58,11 @@ userSchema.methods.generateAccessToken = function () {
         {
             _id: this._id,
             email: this.email,
-            username: this.username,
-            fullName: this.fullName
+            fullname: this.fullname  // Ensure this matches your schema field name
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '1h'  // Default expiry if not set
         }
     );
 };
@@ -64,7 +75,7 @@ userSchema.methods.generateRefreshToken = function () {
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '7d'  // Default expiry if not set
         }
     );
 };

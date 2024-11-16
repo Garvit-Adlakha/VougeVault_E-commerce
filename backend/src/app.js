@@ -2,7 +2,8 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import productRoutes from './routes/product.routes.js';
-import userRoutes from './routes/user.routes.js';
+import userRoutes from './routes/user.routes.js'
+import cartRoutes from './routes/cart.routes.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -44,7 +45,8 @@ app.get("/", (req, res) => {
 
 // Import and use routes
 app.use('/api/v1/products', productRoutes);
-app.use('/api/v1/users', userRoutes); // Updated to use the /api/v1/users path
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/cart',cartRoutes) // Updated to use the /api/v1/users path
 
 // Start the server
 portfinder.getPortPromise()
