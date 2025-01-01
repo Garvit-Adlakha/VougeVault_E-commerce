@@ -48,16 +48,5 @@ app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/cart',cartRoutes) // Updated to use the /api/v1/users path
 
-// Start the server
-portfinder.getPortPromise()
-    .then((port) => {
-        app.listen(port, () => {
-            console.log(`Server is running on port ${port}`);
-        });
-    })
-    .catch((err) => {
-        console.error('Error finding a port:', err);
-    });
-
 // Export the app for use in other modules
 export { app };

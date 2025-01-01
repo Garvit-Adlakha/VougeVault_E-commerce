@@ -6,9 +6,10 @@ import AutoIncrementFactory from 'mongoose-sequence';
 const AutoIncrement = AutoIncrementFactory(mongoose);
 
 const userSchema = new Schema({
-    userId: {
-        type: Number,
-        unique:true,
+    username:{
+        type:String,
+        required:true,
+        trim:true,
     },
     email: {
         type: String,
@@ -38,8 +39,6 @@ const userSchema = new Schema({
 }, {
     timestamps: true
 });
-
-userSchema.plugin(AutoIncrement, { inc_field: 'userId' });
 // Pre-save hook to hash the password before saving the user
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
@@ -54,30 +53,40 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 
 // Custom method to generate an access token
 userSchema.methods.generateAccessToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-            email: this.email,
-            fullname: this.fullname  // Ensure this matches your schema field name
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '1h'  // Default expiry if not set
-        }
-    );
+    try {
+        return jwt.sign(
+            {
+                _id: this._id,
+                email: this.email,
+                username: this.username // Ensure this matches your schema field name
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+                expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '1h' // Default expiry if not set
+            }
+        );
+    } catch (error) {
+        console.error("Error generating access token:", error.message);
+        throw new Error("Failed to generate access token");
+    }
 };
 
 // Custom method to generate a refresh token
 userSchema.methods.generateRefreshToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '7d'  // Default expiry if not set
-        }
-    );
+   try {
+     return jwt.sign(
+         {
+             _id: this._id
+         },
+         process.env.REFRESH_TOKEN_SECRET,
+         {
+             expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '7d'  // Default expiry if not set
+         }
+     );
+   } catch (error) {
+    console.error("Error generating refresh token:", error);
+    throw new Error("Could not generate refresh token");
+   }
 };
 
 // Export the User model

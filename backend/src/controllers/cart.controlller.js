@@ -1,106 +1,102 @@
 import { Cart } from "../models/cart.model.js";
 import { Product } from "../models/product.model.js";
+import { User } from "../models/user.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import mongoose from "mongoose";
 
-// Add product to cart (or update quantity if already exists)
-export const addToCart = async (req, res) => {
+const addToCart = asyncHandler(async (req, res) => {
     try {
-        const { userId, productId, size, quantity } = req.body;
+        const { productId, quantity, size } = req.body;
+        const userId = req.user._id; 
 
-        // Check if the product already exists in the user's cart
-        const existingCartItem = await Cart.findOne({ userId, productId, size });
+        // Check if the user exists
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        // Check if the product already exists in the cart
+        const existingCartItem = await Cart.findOne({
+            userId,
+            productId,
+            size,
+        });
 
         if (existingCartItem) {
-            // Update quantity if item already exists
+            // If the product exists, update the quantity
             existingCartItem.quantity += quantity;
             await existingCartItem.save();
-            return res.status(200).json({ message: "Cart updated successfully", cartItem: existingCartItem });
+            return res.status(200).json(
+                new ApiResponse(200, existingCartItem, "Added to existing cart successfully")
+            );
         }
 
-        // Create a new cart item if it doesn't exist
-        const newCartItem = new Cart({ userId, productId, size, quantity });
+        // If the product doesn't exist, create a new cart item
+        const newCartItem = new Cart({
+            userId,
+            productId,
+            size: size || "NA", // Default size if not provided
+            quantity,
+        });
+
         await newCartItem.save();
-        res.status(201).json({ message: "Product added to cart", cartItem: newCartItem });
-
+        return res.status(201).json(
+            new ApiResponse(201, newCartItem, "Added new cart item successfully")
+        );
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error adding product to cart", error: error.message });
+        console.error(error); // Log error for debugging
+        throw new ApiError(500, "Something went wrong while adding to cart");
     }
-};
+});
 
-// Get all products in the user's cart
-export const getCart = async (req, res) => {
-    try {
-        const { userId } = req.params;
-
-        // Populate the product details for the cart items
-        const cartItems = await Cart.find({ userId })
-            .populate("productId", "name new_price image");
-
-        res.status(200).json(cartItems);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error fetching cart", error: error.message });
+const removeFromCart = asyncHandler(async (req, res) => {
+    const userId = req.user._id; 
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
-};
 
-// Update product quantity in the cart
-export const updateCartItem = async (req, res) => {
-    try {
-        const { userId, productId, size, quantity } = req.body;
+    const { productId, quantityToRemove, size } = req.body;
+    const existingCartItem = await Cart.findOne({
+        userId,
+        productId,
+        size: size || "NA",
+    });
 
-        const cartItem = await Cart.findOne({ userId, productId, size });
-
-        if (!cartItem) {
-            return res.status(404).json({ message: "Cart item not found" });
-        }
-
-        // Update the quantity
-        cartItem.quantity = quantity;
-        await cartItem.save();
-
-        res.status(200).json({ message: "Cart item updated successfully", cartItem });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error updating cart item", error: error.message });
+    if (!existingCartItem) {
+        throw new ApiError(404, "Cart item not found");
     }
-};
 
-// Remove product from the cart
-export const removeFromCart = async (req, res) => {
-    try {
-        const { userId, productId, size } = req.body;
-
-        const cartItem = await Cart.findOneAndDelete({ userId, productId, size });
-
-        if (!cartItem) {
-            return res.status(404).json({ message: "Cart item not found" });
-        }
-
-        res.status(200).json({ message: "Product removed from cart", cartItem });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error removing product from cart", error: error.message });
+    // Validate quantity to remove
+    if (quantityToRemove <= 0) {
+        throw new ApiError(400, "Quantity to remove must be greater than zero");
     }
-};
 
-// Clear all products from the cart
-export const clearCart = async (req, res) => {
-    try {
-        const { userId } = req.body;
-
-        const result = await Cart.deleteMany({ userId });
-
-        res.status(200).json({ message: "Cart cleared successfully", result });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error clearing cart", error: error.message });
+    // Check if trying to remove more than available quantity
+    if (quantityToRemove > existingCartItem.quantity) {
+        throw new ApiError(400, "Cannot remove more than the available quantity in the cart");
     }
-};
 
+    // Update or delete the cart item
+    if (existingCartItem.quantity > quantityToRemove) {
+        existingCartItem.quantity -= quantityToRemove;
+        await existingCartItem.save();
+        return res.status(200).json(
+            new ApiResponse(200, existingCartItem, "Cart item updated successfully")
+        );
+    } else {
+        await existingCartItem.delete();
+        return res.status(200).json(
+            new ApiResponse(200, {}, "Cart item removed successfully")
+        );
+    }
+});
 // Get total amount of products in the cart (calculation based on price * quantity)
-export const getTotalCartAmount = async (req, res) => {
+const getTotalCartAmount = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.user._id; 
 
         const cartItems = await Cart.find({ userId }).populate("productId", "new_price");
 
@@ -116,9 +112,9 @@ export const getTotalCartAmount = async (req, res) => {
 };
 
 // Get total number of items (sum of quantities) in the cart
-export const getTotalCartItems = async (req, res) => {
+const getTotalCartItems = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.user._id; 
 
         const cartItems = await Cart.find({ userId });
 
@@ -130,3 +126,10 @@ export const getTotalCartItems = async (req, res) => {
         res.status(500).json({ message: "Error calculating total items", error: error.message });
     }
 };
+
+export{
+    addToCart,
+    removeFromCart,
+    getTotalCartAmount,
+    getTotalCartItems
+}

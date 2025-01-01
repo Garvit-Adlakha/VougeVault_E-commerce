@@ -9,6 +9,7 @@ export const LoginSignup = () => {
   const [state, setState] = useState("Login");
   const [formData, setFormData] = useState({
     fullname: "",
+    username:"",
     password: "",
     email: ""
   });
@@ -34,7 +35,7 @@ export const LoginSignup = () => {
 
   const handleSignUp = async () => {
     try {
-      const response = await axios.post('http://localhost:4000/api/v1/users/signup', formData);
+      const response = await axios.post('http://localhost:4000/api/v1/users/register', formData);
       if (response.data.success) {
         login(response.data.user); // Use the login function
         navigate('/');
@@ -66,6 +67,14 @@ export const LoginSignup = () => {
               className="h-14 w-full px-4 border border-gray-300 rounded-lg text-gray-700 focus:border-yellow-500 focus:outline-none"
             />
           )}
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={changeHandler}
+            placeholder="Enter your username"
+            className="h-14 w-full px-4 border border-gray-300 rounded-lg text-gray-700 focus:border-yellow-500 focus:outline-none"
+          />
           <input
             type="email"
             name="email"
