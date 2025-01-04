@@ -1,11 +1,17 @@
 import { Router } from 'express';
-import { addProduct, removeProduct, getAllProducts, uploadProductImage } from '../controllers/product.controller.js';
+import { addProduct, removeProduct, getAllProducts } from '../controllers/product.controller.js';
 import { upload } from '../middlewares/multer.middleware.js';
 const router = Router();
 
-router.post('/addproduct', addProduct);
+router.route('/addproduct').post(
+    upload.fields([
+        {
+            name:"image",
+        }
+    ]),
+    addProduct
+);
 router.post('/removeproduct', removeProduct);
 router.get('/allproducts', getAllProducts);
-router.post('/upload', upload.single('product'), uploadProductImage);
 
 export default router;

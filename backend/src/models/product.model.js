@@ -1,11 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 
 const productSchema = new Schema({
+    id:{
+        type:Number,
+        required:true
+    },
     name: {
         type: String,
         required: true,
     },
-    image: {
+    image:{
         type: String,
         required: true,
     },
@@ -13,13 +17,17 @@ const productSchema = new Schema({
         type: Number,
         required: true,
     },
-    old_price: {
+    price: {
         type: Number,
         required: true,
     },
     date: {
         type: Date,
         default: Date.now,
+    },
+    category:{
+        type:String,
+        required:true
     },
     available: { // Corrected the spelling
         type: Boolean,
