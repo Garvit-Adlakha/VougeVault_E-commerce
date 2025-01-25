@@ -9,10 +9,14 @@ export const Breadcrum = (props) => {
       <span>Home</span>
       <img className="inline" src={arrow_icon} alt="arrow icon" />
       <span>Shop</span>
-      <img className="inline" src={arrow_icon} alt="arrow icon" />
-      <span>{product.category}</span>
-      <img className="inline" src={arrow_icon} alt="arrow icon" />
-      <span>{product.name}</span>
+      {product && (
+        <>
+          <img className="inline" src={arrow_icon} alt="arrow icon" />
+          <span>{product.category}</span>
+          <img className="inline" src={arrow_icon} alt="arrow icon" />
+          <span>{product.name}</span>
+        </>
+      )}
     </div>
   );
 };

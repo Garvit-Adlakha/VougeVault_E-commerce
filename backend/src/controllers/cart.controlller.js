@@ -11,6 +11,9 @@ const addToCart = asyncHandler(async (req, res) => {
         const { productId, quantity, size } = req.body;
         const userId = req.user._id; 
 
+        const product = await Product.findOne({
+            id: productId
+        });
         // Check if the user exists
         const user = await User.findById(userId);
         if (!user) {

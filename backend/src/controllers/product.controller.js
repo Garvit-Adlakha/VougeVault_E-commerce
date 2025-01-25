@@ -1,5 +1,4 @@
 import { Product } from '../models/product.model.js';
-import { User } from '../models/user.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
@@ -65,13 +64,39 @@ export const removeProduct = async (req, res) => {
 };
 
 // Get all products
-export const getAllProducts = async (req, res) => {
+export const getAllProducts = asyncHandler(async (req, res) => {
     try {
         let products = await Product.find({});
         console.log("All products fetched");
 
-        res.send(products);
+        res.status(200).json(new ApiResponse(200, products, "All products fetched successfully"));
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
-};
+});
+export const getProductsByCategory=asyncHandler(async(req,res)=>{
+    try{
+        let products=await Product.find({
+            category:req.params.category
+        })
+        console.log("Products fetched by category");
+        console.log(products);
+        res.status(200).json(new ApiResponse(200, products, "Products fetched by category successfully"));
+    }
+    catch(error){
+        res.status(500).json(new ApiResponse(500,{},"Error fetching products by category"));
+    }
+})
+export const getProductById=asyncHandler(async (req,res)=>{
+    try{
+        let product=await Product.findOne({
+            id:req.params.id
+        })
+        console.log("Product fetched by id");
+        console.log(product);
+        res.status(200).json(new ApiResponse(200, product, "Product fetched by id successfully"));
+    }
+    catch(error){
+        res.status(500).json(new ApiResponse(500,{},"Error fetching product by id"));
+    }
+})

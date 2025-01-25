@@ -1,11 +1,24 @@
-import React, { useState, useContext } from 'react';
-import { ShopContext } from '../Context/ShopContext';
+import React, { useContext, useState, useEffect } from 'react';
+import { ShopContext } from '../Context/ShopContext.jsx';
 import dropdown_icon from '../Components/Assets/dropdown_icon.png';
 import { Item } from '../Components/Item/Item';
 
 export const ShopCategory = (props) => {
-  const { all_product } = useContext(ShopContext);
-  const filtered_products = all_product.filter(item => item.category === props.category);
+  const { productsByCategory } = useContext(ShopContext);
+  const [filtered_products, setFilteredProducts] = useState([]);
+  
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const products = await productsByCategory(props.category);
+        setFilteredProducts(products ?? []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, [productsByCategory, props.category]);
 
   const [productsToShow, setProductsToShow] = useState(4);
   const [sortOrder, setSortOrder] = useState('low-to-high');
@@ -49,7 +62,7 @@ export const ShopCategory = (props) => {
       <div className='flex justify-center items-center'>
       <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-10 md:grid-cols-3 gap-6 mb-16 w-full max-w-fit">
         {sortedProducts.slice(0, productsToShow).map((item) => (
-          <div key={item.id} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div key={item._id} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
             <Item className="w-[80%] h-[80%]"
               id={item.id}
               name={item.name}
